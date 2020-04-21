@@ -3,7 +3,7 @@ function [figH] = getFigH(numfigs,varargin)
 %   Detailed explanation goes here
 
 % set default values
-windowSyle = 'normal';
+windowSyle = 'keep';
 setcolor = false;
 
 % parse variable inputs
@@ -36,8 +36,8 @@ if logical(numel(figHtemp))
         map =  [map; fig figHtemp(fig).Number];
     end
     [~,map] = sort(map(:,2),'descend');
-    figH = gobjects(numfigs);
-    for fig=1:numfigs
+    figH = gobjects(numfigs,1);
+    for fig=1:numel(figHtemp)
         figH(fig) = figHtemp(map(fig));
         set(0,'CurrentFigure',figH(fig));clf;
     end
@@ -46,7 +46,6 @@ if logical(numel(figHtemp))
         drawnow
     end
     delete(figHtemp(numfigs+1:end))
-    clearvars figHtemp map
 else
     for fig=1:numfigs
         figH(fig) = figure();
@@ -55,7 +54,11 @@ else
 end
 % apply configs
 for fig=1:numel(figH)
-    figH(fig).WindowStyle = windowSyle;
+    if strcmp(windowSyle,'keep')
+        figH(fig).WindowStyle = figHtemp(map(fig)).WindowStyle;
+    else
+        figH(fig).WindowStyle = windowSyle;
+    end
     if setcolor
         figH(fig).Color = color;
     end
