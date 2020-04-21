@@ -33,10 +33,11 @@ figHtemp = findobj('type','figure');
 if logical(numel(figHtemp))
     map = [];
     for fig=1:numel(figHtemp)
-        map(fig) = figHtemp(fig).Number;
+        map =  [map; fig figHtemp(fig).Number];
     end
-%     [~,map] = sort(map(:,2),'descend');
-    for fig=1:numel(figHtemp)
+    [~,map] = sort(map(:,2),'descend');
+    figH = gobjects(numfigs);
+    for fig=1:numfigs
         figH(fig) = figHtemp(map(fig));
         set(0,'CurrentFigure',figH(fig));clf;
     end
