@@ -4,6 +4,7 @@ function [figH] = getFigH(numfigs,varargin)
 
 % set default values
 windowSyle = 'normal';
+setcolor = false;
 
 % parse variable inputs
 for inp=1:2:numel(varargin)
@@ -16,6 +17,14 @@ for inp=1:2:numel(varargin)
                 windowSyle = lower(lower(varargin{inp+1}));
             else
                 error('Unrecognized WindowStyle Parameter');
+            end
+        case 'color'
+            setcolor = true;
+            switch lower(varargin{inp+1})
+                case 'default'
+                    color = '#F0F0F0';  % hex value of Matlab-default background color
+                otherwise               % ToDo: proper detection of type and validity of input
+                    color = lower(varargin{inp+1});
             end
     end
 end
@@ -43,8 +52,12 @@ else
         drawnow();
     end
 end
+% apply configs
 for fig=1:numel(figH)
     figH(fig).WindowStyle = windowSyle;
+    if setcolor
+        figH(fig).Color = color;
+    end
 end
 
 end
