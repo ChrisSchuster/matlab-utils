@@ -37,7 +37,7 @@ if logical(numel(figHtemp))
     end
     [~,map] = sort(map(:,2),'descend');
     figH = gobjects(numfigs,1);
-    for fig=1:numel(figHtemp)
+    for fig=1:min(numfigs,numel(figHtemp))
         figH(fig) = figHtemp(map(fig));
         set(0,'CurrentFigure',figH(fig));clf;
     end
@@ -45,7 +45,6 @@ if logical(numel(figHtemp))
         figH(fig+1) = figure();
         drawnow
     end
-    delete(figHtemp(numfigs+1:end))
 else
     for fig=1:numfigs
         figH(fig) = figure();
