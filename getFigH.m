@@ -41,8 +41,8 @@ if logical(numel(figHtemp))
         figH(fig) = figHtemp(map(fig));
         set(0,'CurrentFigure',figH(fig));clf;
     end
-    for fig=fig:numfigs-numel(figHtemp)
-        figH(fig+1) = figure();
+    for fig=(fig+1):numfigs
+        figH(fig) = figure();
         drawnow
     end
 else
@@ -63,5 +63,6 @@ for fig=1:numel(figH)
     end
 end
 
+delete(figHtemp(map(numfigs+1:end)))
 end
 
