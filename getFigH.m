@@ -3,8 +3,9 @@ function [figH] = getFigH(numfigs,varargin)
 %   Detailed explanation goes here
 
 % set default values
-windowSyle = 'keep';
-setcolor = false;
+windowStyleMode = 'default';
+windowStyle = 'docked';     % default window style
+setcolor = false;       % default should be true, only if user specifies it, should we do something
 
 % parse variable inputs
 for inp=1:2:numel(varargin)
@@ -14,7 +15,10 @@ for inp=1:2:numel(varargin)
     switch lower(varargin{inp})
         case 'windowstyle'
             if any(contains({'docked','modal','normal'},lower(varargin{inp+1})))
-                windowSyle = lower(lower(varargin{inp+1}));
+                windowStyleMode = 'setspecific';
+                windowStyle = lower(lower(varargin{inp+1}));
+            elseif strcmpi('keep',varargin{inp+1})
+                windowStyleMode = 'keep';
             else
                 error('Unrecognized WindowStyle Parameter');
             end
@@ -53,16 +57,21 @@ else
 end
 % apply configs
 for fig=1:numel(figH)
-    if strcmp(windowSyle,'keep')
-        figH(fig).WindowStyle = figHtemp(map(fig)).WindowStyle;
-    else
-        figH(fig).WindowStyle = windowSyle;
+    switch windowStyleMode
+        case 'keep'
+            figH(fig).WindowStyle = figHtemp(map(fig)).WindowStyle;
+        case 'default'
+            figH(fig).WindowStyle = windowStyle;
+        case 'setspecific'
+            figH(fig).WindowStyle = windowStyle;
     end
     if setcolor
         figH(fig).Color = color;
     end
 end
 
-delete(figHtemp(map(numfigs+1:end)))
+if numel(figHtemp)
+    delete(figHtemp(map(numfigs+1:end)))
+end
 end
 
