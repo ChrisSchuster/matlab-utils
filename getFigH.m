@@ -44,7 +44,7 @@ if logical(numel(figHtemp))                     % if there currently exist figur
     for fig=1:numel(figHtemp)                   % create a map from from handle index in struct to inherent sequential number of the figure handle
         map =  [map; fig figHtemp(fig).Number];
     end
-    [~,map] = sort(map(:,2),'descend');
+    [~,map] = sort(map(:,2),'ascend');
     figH = gobjects(numfigs,1);                 % empty graphic object to be filled with figure handles
     for fig=1:min(numfigs,numel(figHtemp))      % fill gobject with existing figure handles
         figH(fig) = figHtemp(map(fig));
@@ -77,7 +77,7 @@ for fig=1:numel(figH)
         figH(fig).Color = color;
     end
     if caxis
-        axH(fig) = axes();
+        axH(fig) = axes(figH(fig));
     end
 end
 
@@ -90,4 +90,3 @@ if exist('axH','var')
     varargout{2} = axH;
 end
 end
-
