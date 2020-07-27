@@ -33,23 +33,23 @@ for inp=1:2:numel(varargin)
     end
 end
 
-figHtemp = findobj('type','figure');
-if logical(numel(figHtemp))
+figHtemp = findobj('type','figure');            % retrieve handles for currently existing figures
+if logical(numel(figHtemp))                     % if there currently exist figures, reuse the handles
     map = [];
-    for fig=1:numel(figHtemp)
+    for fig=1:numel(figHtemp)                   % create a map from from handle index in struct to inherent sequential number of the figure handle
         map =  [map; fig figHtemp(fig).Number];
     end
     [~,map] = sort(map(:,2),'descend');
-    figH = gobjects(numfigs,1);
-    for fig=1:min(numfigs,numel(figHtemp))
+    figH = gobjects(numfigs,1);                 % empty graphic object to be filled with figure handles
+    for fig=1:min(numfigs,numel(figHtemp))      % fill gobject with existing figure handles
         figH(fig) = figHtemp(map(fig));
-        set(0,'CurrentFigure',figH(fig));clf;
+        set(0,'CurrentFigure',figH(fig));clf;   % activate each and clear the figure
     end
-    for fig=(fig+1):numfigs
+    for fig=(fig+1):numfigs                     % if fewer handles exist previously than requested, create the remaining amount
         figH(fig) = figure();
-        drawnow
+        drawnow();
     end
-else
+else                                            % if no handles exist previously, create all of them
     for fig=1:numfigs
         figH(fig) = figure();
         drawnow();
