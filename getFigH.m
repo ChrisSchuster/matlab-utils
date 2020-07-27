@@ -1,11 +1,13 @@
-function [figH] = getFigH(numfigs,varargin)
+function [varargout] = getFigH(numfigs,varargin)
 %GETFIGH Summary of this function goes here
 %   Detailed explanation goes here
 
 % set default values
 windowStyleMode = 'default';
 windowStyle = 'docked';     % default window style
-setcolor = false;       % default should be true, only if user specifies it, should we do something
+setcolor = false;           % per default no color is specified
+caxis = false;              % per default no axis handles are createds
+nout = 1;                   % we return at least one element, the figure handle
 
 % parse variable inputs
 for inp=1:2:numel(varargin)
@@ -30,6 +32,9 @@ for inp=1:2:numel(varargin)
                 otherwise               % ToDo: proper detection of type and validity of input
                     color = lower(varargin{inp+1});
             end
+        case 'createaxis'
+            caxis = true;
+            nout = nout +1;             % we return one more elemnt
     end
 end
 
@@ -55,6 +60,9 @@ else                                            % if no handles exist previously
         drawnow();
     end
 end
+if caxis                                        % if requested create empty graphic object to be filled with axis handles
+    axH = gobjects(numfigs,1);
+end
 % apply configs
 for fig=1:numel(figH)
     switch windowStyleMode
@@ -68,10 +76,18 @@ for fig=1:numel(figH)
     if setcolor
         figH(fig).Color = color;
     end
+    if caxis
+        axH(fig) = axes();
+    end
 end
 
 if numel(figHtemp)
     delete(figHtemp(map(numfigs+1:end)))
+end
+
+varargout{1} = figH;
+if exist('axH','var')
+    varargout{2} = axH;
 end
 end
 
