@@ -22,7 +22,9 @@ function [figH] = getFigH(numfigs,varargin)
 % set default values
 windowStyleMode = 'default';
 windowStyle = 'docked';     % default window style
-setcolor = false;       % default should be true, only if user specifies it, should we do something
+setcolor = false;           % per default no color is specified
+caxis = false;              % per default no axis handles are createds
+nout = 1;                   % we return at least one element, the figure handle
 
 % parse variable inputs
 for inp=1:2:numel(varargin)
@@ -47,6 +49,9 @@ for inp=1:2:numel(varargin)
                 otherwise               % ToDo: proper detection of type and validity of input
                     color = lower(varargin{inp+1});
             end
+        case 'createaxis'
+            caxis = true;
+            nout = nout +1;             % we return one more elemnt
     end
 end
 
@@ -56,7 +61,7 @@ if logical(numel(figHtemp))                     % if there currently exist figur
     for fig=1:numel(figHtemp)                   % create a map from from handle index in struct to inherent sequential number of the figure handle
         map =  [map; fig figHtemp(fig).Number];
     end
-    [~,map] = sort(map(:,2),'descend');
+    [~,map] = sort(map(:,2),'ascend');
     figH = gobjects(numfigs,1);                 % empty graphic object to be filled with figure handles
     for fig=1:min(numfigs,numel(figHtemp))      % fill gobject with existing figure handles
         figH(fig) = figHtemp(map(fig));
@@ -72,6 +77,9 @@ else                                            % if no handles exist previously
         drawnow();
     end
 end
+if caxis                                        % if requested create empty graphic object to be filled with axis handles
+    axH = gobjects(numfigs,1);
+end
 % apply configs
 for fig=1:numel(figH)
     switch windowStyleMode
@@ -85,10 +93,17 @@ for fig=1:numel(figH)
     if setcolor
         figH(fig).Color = color;
     end
+    if caxis
+        axH(fig) = axes(figH(fig));
+    end
 end
 
 if numel(figHtemp)
     delete(figHtemp(map(numfigs+1:end)))
 end
-end
 
+varargout{1} = figH;
+if exist('axH','var')
+    varargout{2} = axH;
+end
+end
