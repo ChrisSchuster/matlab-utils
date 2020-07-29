@@ -1,6 +1,23 @@
 function [figH] = getFigH(numfigs,varargin)
-%GETFIGH Summary of this function goes here
-%   Detailed explanation goes here
+%  [figH] = GETFIGH(numfigs,varargin) Creates figure handles
+%   Matlab plotting features per default create figure objects as parent
+%   object. Manipulating them requires having a reference to the object
+%   handle. GETFIGH creates a handle to figure objects, that can be passed
+%   to plotting features and can be manipulated more easily.
+%
+%%   Arguments:
+%    - numfigs: number of figures to create
+%    - WindowStyle: docked (default), modal, normal
+%    - Color: default, hexcode
+%   Explanation:
+%    - WindowStyle: modal: floating window, figures are tabbed in the
+%                   window
+%                   docked: window element is docked in the Matlab UI
+%                   int the position last used
+%    - Color: default: uses the default color Matlab uses as backdrop for
+%             figures
+%             hexcode: sets the hexcode provided as backdrop color
+%%
 
 % set default values
 windowStyleMode = 'default';
