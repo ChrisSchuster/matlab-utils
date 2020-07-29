@@ -1,4 +1,4 @@
-function [figH] = getFigH(numfigs,varargin)
+function [varargout] = getFigH(numfigs,varargin)
 %  [figH] = GETFIGH(numfigs,varargin) Creates figure handles
 %   Matlab plotting features per default create figure objects as parent
 %   object. Manipulating them requires having a reference to the object
