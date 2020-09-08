@@ -24,14 +24,15 @@ windowStyleMode = 'default';
 windowStyle = 'docked';     % default window style
 setcolor = false;           % per default no color is specified
 caxis = false;              % per default no axis handles are createds
-nout = 1;                   % we return at least one element, the figure handle
 
 % check for empty input
 if ~nargin
-    numfigs = 1;
-    varargin = {};
+    numfigs = 1;            % default is 1 figure handle
 end
-
+% when 2 outputs are specified, create and return an axis handle
+if nargout==2
+    caxis = true;
+end
 % parse variable inputs
 for inp=1:2:numel(varargin)
     if ~(ischar(varargin{inp}))
@@ -56,8 +57,8 @@ for inp=1:2:numel(varargin)
                     color = lower(varargin{inp+1});
             end
         case 'createaxis'
+            warning("The argument 'createaxis' is depreciated. Specifying two output variables is emough, to recieve an axis handle as well.")
             caxis = true;
-            nout = nout +1;             % we return one more elemnt
     end
 end
 
@@ -107,9 +108,10 @@ end
 if numel(figHtemp)
     delete(figHtemp(map(numfigs+1:end)))
 end
-
+% return handles
 varargout{1} = figH;
-if exist('axH','var')
+% when create axis flag is set, also return the axis handle
+if caxis
     varargout{2} = axH;
 end
 end
