@@ -26,6 +26,12 @@ setcolor = false;           % per default no color is specified
 caxis = false;              % per default no axis handles are createds
 nout = 1;                   % we return at least one element, the figure handle
 
+% check for empty input
+if ~nargin
+    numfigs = 1;
+    varargin = {};
+end
+
 % parse variable inputs
 for inp=1:2:numel(varargin)
     if ~(ischar(varargin{inp}))
