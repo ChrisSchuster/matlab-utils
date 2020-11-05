@@ -7,7 +7,7 @@ function [varargout] = getFigH(numfigs,varargin)
 %
 %%   Arguments:
 %    - numfigs: number of figures to create
-%    - WindowStyle: docked (default), modal, normal
+%    - WindowStyle: docked (default), modal, normal, keep
 %    - Color: default, hexcode
 %   Explanation:
 %    - WindowStyle: modal: floating window, figures are tabbed in the
