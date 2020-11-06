@@ -102,6 +102,12 @@ for fig=1:numel(figH)
     end
     if caxis
         axH(fig) = axes(figH(fig));
+        axH(fig).XGrid = 'on';
+        axH(fig).YGrid = 'on';
+        axH(fig).ZGrid = 'on';
+        axH(fig).XMinorGrid = 'on';
+        axH(fig).YMinorGrid = 'on';
+        axH(fig).ZMinorGrid = 'on';
     end
 end
 
