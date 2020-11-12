@@ -63,7 +63,8 @@ for inp=1:2:numel(varargin)
 end
 
 figHtemp = findobj('type','figure');            % retrieve handles for currently existing figures
-if logical(numel(figHtemp))                     % if there currently exist figures, reuse the handles
+PrevFig = logical(numel(figHtemp));             % previous existing figures flag
+if PrevFig                     % if there currently exist figures, reuse the handles
     map = [];
     for fig=1:numel(figHtemp)                   % create a map from from handle index in struct to inherent sequential number of the figure handle
         map =  [map; fig figHtemp(fig).Number];
@@ -91,7 +92,11 @@ end
 for fig=1:numel(figH)
     switch windowStyleMode
         case 'keep'
-            figH(fig).WindowStyle = figHtemp(map(fig)).WindowStyle;
+            if PrevFig
+                figH(fig).WindowStyle = figHtemp(map(fig)).WindowStyle;
+            else
+                figH(fig).WindowStyle = windowStyle;
+            end
         case 'default'
             figH(fig).WindowStyle = windowStyle;
         case 'setspecific'
