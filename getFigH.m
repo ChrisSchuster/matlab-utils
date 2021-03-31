@@ -114,6 +114,8 @@ for fig=1:numel(figH)
         axH(fig).YMinorGrid = 'on';
         axH(fig).ZMinorGrid = 'on';
     end
+    axH(fig).Title.FontWeight = 'normal';
+    axH(fig).Title.FontSize = 13;
 end
 
 if numel(figHtemp)
