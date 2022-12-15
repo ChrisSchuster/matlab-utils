@@ -12,7 +12,7 @@ for file = 1:numel(dircontents)             % loop over all files in the directo
         continue;
     end
 
-    if contains(dircontents(file).name,fileTypeExtension)
+    if endsWith(dircontents(file).name,fileTypeExtension)
         returnmask(file,1) = true;
     end
 end
