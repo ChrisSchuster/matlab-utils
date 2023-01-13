@@ -13,6 +13,9 @@ if envExists                                                % read path from env
     envPath = fscanf(fID,'%c');                             % parse the file contents, returns path stored in the env variable
 else                                                        % create the env variable if not found, store the desired default path
     envPath = uigetdir("C:\",'Define default directory');   % open folder selection dialog box
+    if isnumeric(envPath)
+        error('User abort during selection of default path.\n');
+    end
     fID = fopen('.env','w');                                % create the environmental variable in the root of the invocing script
     fprintf(fID,'%s',envPath);                              % write the desired default path to the env variable
 end
