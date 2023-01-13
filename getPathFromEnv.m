@@ -1,4 +1,4 @@
-function [fsPath] = getDirPathFromEnv(type)
+function [fsPath] = getPathFromEnv(type)
 %GETDIRPATHFROMENV Returns a path from environment variable at the root of the invoking script
 %   input: empty
 %   output: filesystem path as char
