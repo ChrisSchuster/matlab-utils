@@ -1,5 +1,5 @@
 function [fsPath] = getDirPathFromEnv(type)
-%GETDIRPATHFROMENV Returns a path from environment variable at the root of the invocing script
+%GETDIRPATHFROMENV Returns a path from environment variable at the root of the invoking script
 %   input: empty
 %   output: filesystem path as char
 %   
@@ -16,7 +16,7 @@ else                                                        % create the env var
     if isnumeric(envPath)
         error('User abort during selection of default path.\n');
     end
-    fID = fopen('.env','w');                                % create the environmental variable in the root of the invocing script
+    fID = fopen('.env','w');                                % create the environmental variable in the root of the invoking script
     fprintf(fID,'%s',envPath);                              % write the desired default path to the env variable
 end
 
