@@ -24,8 +24,9 @@ switch type
     case 'folder'
         fsPath = uigetdir(envPath,'Select source directory');   % open the folder selection dialog box
     case 'file'
-        envPath = strcat(envPath,'\*.*');
-        fsPath = uigetfile(envPath,'Select source file');       % open the folder selection dialog box
+        filter = strcat(envPath,'\*.*');
+        [filename, path] = uigetfile(filter,'Select source file');       % open the folder selection dialog box
+        fsPath = fullfile(path,filename);
 end
 
 status = fclose(fID);                                       % close the file containing the environment varibale
