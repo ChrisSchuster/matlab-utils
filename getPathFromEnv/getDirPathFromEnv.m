@@ -1,4 +1,4 @@
-function [fsPath] = getDirPathFromEnv()
+function [fsPath] = getDirPathFromEnv(type)
 %GETDIRPATHFROMENV Returns a path from environment variable at the root of the invocing script
 %   input: empty
 %   output: filesystem path as char
@@ -17,7 +17,13 @@ else                                                        % create the env var
     fprintf(fID,'%s',envPath);                              % write the desired default path to the env variable
 end
 
-fsPath = uigetdir(envPath,'Select source directory');       % open the folder selection dialog box
+switch type
+    case 'folder'
+        fsPath = uigetdir(envPath,'Select source directory');   % open the folder selection dialog box
+    case 'file'
+        envPath = strcat(envPath,'\*.*');
+        fsPath = uigetfile(envPath,'Select source file');       % open the folder selection dialog box
+end
 
 status = fclose(fID);                                       % close the file containing the environment varibale
 
