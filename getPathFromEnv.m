@@ -19,9 +19,9 @@ if envExists
         createEnvXML(caller,envPath, version);
     else
         envs = readstruct(fullfile(cd,'.env'),"FileType","xml");
-        numberCallers = numel(envs.env);
-        callers = strings(1,numberCallers);
-        for env = 1:numel(envs.env)
+        numberEnvs = numel(envs.env);
+        callers = strings(1,numberEnvs);
+        for env = 1:numberEnvs
             callers(env) = envs.env(env).caller;
         end
         callerIndex = matches(callers,caller);
