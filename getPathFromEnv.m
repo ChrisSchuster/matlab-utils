@@ -13,11 +13,15 @@ caller = caller(2).name;        % get the name of the function that invoked getP
 
 %% look for and read the environmental variable
 if envExists
-    % read path from environment varibale if set
+    % an environment varibale was found, read path from it
     [isOld, envPath] = isOldstyleEnv();
     if isOld
+        % the env variable was formatted in the oldstyle (plain text)
+        % create a new env variable (overwriting the old one) in the new format
         createEnvXML(caller,envPath, version);
     else
+        % the env varibale is well formed
+        % read from it the desired path
         envs = readstruct(fullfile(cd,'.env'),"FileType","xml");
         numberEnvs = numel(envs.env);
         callers = strings(1,numberEnvs);
@@ -26,7 +30,8 @@ if envExists
         end
         callerIndex = matches(callers,caller);
         if ~any(callerIndex)
-            % if caller is not in the env, add it
+            % the caller was not found in the env
+            % add it and store the desired path
             envPath = selectEnvPath();
             newEnvIndex = numberEnvs+1;
             envs.env(newEnvIndex).caller = caller;
@@ -39,7 +44,8 @@ if envExists
     end
 
 else
-    % create the env variable if not found, store the desired default path
+    % an env variable was not found, create it and store the desired
+    % default path in it
     envPath = selectEnvPath();
     createEnvXML(caller, envPath, version);
 end
