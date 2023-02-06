@@ -28,8 +28,9 @@ if envExists
         if ~any(callerIndex)
             % if caller is not in the env, add it
             envPath = selectEnvPath();
-            envs.env(end+1).caller = caller;
-            envs.env(end).path = envPath;
+            newEnvIndex = numberEnvs+1;
+            envs.env(newEnvIndex).caller = caller;
+            envs.env(newEnvIndex).path = envPath;
             writestruct(envs,fullfile(cd,'.env'),"FileType","xml");
         else
             % the caller was found in the env, return the path
