@@ -1,0 +1,12 @@
+{
+    "_schemaVersion": "1.0.0",
+    "getFileList":
+    {
+        "inputs":
+        [
+            {"name":"filesystemPath", "kind":"required", "type":[["char"],["string"]], "purpose":"filesystem path"},
+            {"name":"mode", "kind":"required", "type":[["char", "choices={'all','exclude','include'}"]], "default":"'all'", "purpose":"file extension filter"},
+            {"name":"extensions", "kind":"ordered", "type":[["cell"]], "purpose":"list of file extensions"}
+        ]
+    }
+}
