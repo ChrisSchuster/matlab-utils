@@ -2,7 +2,11 @@ function [signals,dT] = loadMotec(sourcePath)
 %LOADMOTEC loads Motec data into timetable
 %   sourcePath:     path to the Motec exportet .mat file
 %
-%   returned table 'signals' contains metadata in var.Properties.UserData
+%   returnes:
+%   signals:        timetable, contains metadata in var.Properties.UserData
+%   dT:             duration, average timestep of signals <- this may be
+%   removed. a timetable already has a field 'timestep' which seems to
+%   return the same result
 
 data = load(sourcePath);                                                    % load file from disk
 
@@ -25,10 +29,6 @@ dT = (signals.Time(end) - signals.Time(1))/height(signals);                 % ca
 % for some applications it might be required to have a constant timestamp
 % for such cases, this timestep as a average value may be used
 signals.Time.Format = 's';                                                  % show the timestamp as ss:SSS
-
-if any(matches(fldnames,"EShift_Encoder"))                                  % this is application specific, best to move this to a different function
-    signals.angle = bits2rad(signals.EShift_Encoder);
-end
 
 % add metadata to the return value for external use
 signals.Properties.UserData.dT = dT;
