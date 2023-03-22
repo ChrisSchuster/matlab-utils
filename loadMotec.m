@@ -1,32 +1,40 @@
-function [signals,dT] = loadMotec(data)
-%LOADMOTEC Summary of this function goes here
-%   Detailed explanation goes here
+function [signals,dT] = loadMotec(sourcePath)
+%LOADMOTEC loads Motec data into timetable
+%   sourcePath:     path to the Motec exportet .mat file
+%
+%   returned table 'signals' contains metadata in var.Properties.UserData
 
-fldnames = fieldnames(data);
-nSamples = length(data.(fldnames{1}).Time);
-nVariables = numel(fldnames);
-timestamps = data.(fldnames{1}).Time - min(data.(fldnames{1}).Time);
+data = load(sourcePath);                                                    % load file from disk
 
-signals = timetable('Size',[nSamples nVariables],...
+fldnames = fieldnames(data);                                                % get names of signals in file
+nSamples = length(data.(fldnames{1}).Time);                                 % get the number of samples in file
+nVariables = numel(fldnames);                                               % get the number of signals in file
+timestamps = data.(fldnames{1}).Time - min(data.(fldnames{1}).Time);        % shift time to begin sampling @ t=0, this should be selectable using an argument
+
+signals = timetable('Size',[nSamples nVariables],...                        % init the output table
     'VariableTypes',repmat({'double'},[nVariables,1]),...
     'VariableNames',fldnames,...
     'RowTimes',duration(0, 0, timestamps));
 
 for field=1:nVariables
-    if numel(data.(fldnames{field}).Value)==nSamples
-        signals{:,field} = data.(fldnames{field}).Value';
-    end
+    signals{:,field} = data.(fldnames{field}).Value';                       % restructure signals into timetable
 end
 
-dT = (signals.Time(end) - signals.Time(1))/height(signals);
-signals.Time.Format = 's';
+dT = (signals.Time(end) - signals.Time(1))/height(signals);                 % calculate the timestep
+% the timesteps in the MoTeC exportet files aren't constant
+% for some applications it might be required to have a constant timestamp
+% for such cases, this timestep as a average value may be used
+signals.Time.Format = 's';                                                  % show the timestamp as ss:SSS
 
-if any(matches(fldnames,"EShift_Encoder"))
+if any(matches(fldnames,"EShift_Encoder"))                                  % this is application specific, best to move this to a different function
     signals.angle = bits2rad(signals.EShift_Encoder);
 end
 
-if any(matches(fldnames,"EShift_Encoder_HD"))
-    signals.angle_HD = bits2rad(signals.EShift_Encoder_HD);
-end
+% add metadata to the return value for external use
+signals.Properties.UserData.dT = dT;
+
+[~,fName] = fileparts(sourcePath);
+signals.Properties.UserData.srcFileName = fName;
+signals.Properties.UserData.srcFilePath = sourcePath;
 
 end
