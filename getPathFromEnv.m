@@ -6,13 +6,13 @@ function [fsPath] = getPathFromEnv(type)
 %   Usage examples: fsPath = getPathFromEnv();
 %
 
-version = '0.1';                % version of the environmental variable file
-caller = dbstack();             % get the function call stack
-path2env = fileparts(which(caller(2).file));
-path2env = fullfile(path2env,'.env');
+version = '0.1';                                                            % version of the environmental variable file
+caller = dbstack();                                                         % get the function call stack
+path2env = fileparts(which(caller(2).file));                                % get the path of the caller
+path2env = fullfile(path2env,'.env');                                       % create the absolute path to the env variable
 
-caller = caller(2).name;        % get the name of the function that invoked getPathFromEnv()
-envExists = isfile(path2env);     % check if environmental variable is set
+caller = caller(2).name;                                                    % get the name of the function that invoked getPathFromEnv()
+envExists = isfile(path2env);                                               % check if environmental variable is set
 
 %% look for and read the environmental variable
 if envExists
@@ -57,42 +57,44 @@ end
 % return either a user specified folder or file
 switch type
     case 'folder'
-        fsPath = uigetdir(payloadPath,'Select source directory');   % open the folder selection dialog box
+        fsPath = uigetdir(payloadPath,'Select source directory');           % open the folder selection dialog box
     case 'file'
         filter = strcat(payloadPath,'\*.*');
-        [filename, path] = uigetfile(filter,'Select source file');       % open the folder selection dialog box
+        [filename, path] = uigetfile(filter,'Select source file');          % open the folder selection dialog box
         fsPath = fullfile(path,filename);
 end
 
 end
 
-function [isTxtFlag, payloadPath] = isOldstyleEnv(path2env)
+function [isplainTxtFlag, payloadPath] = isOldstyleEnv(path2env)
 % returns false if the env is an XML file
 % returns true and the path if file is not XML
-isTxtFlag = true;
-fID = fopen(path2env, 'r');               % open the file containing the env variable
-payloadPath = fscanf(fID,'%c');                            % parse the file contents, returns path stored in the env variable
-if startsWith(payloadPath,'<?xml version="1.0"')        % check for beginning of XML file
-    isTxtFlag = false;
-    payloadPath = [];                                      % return empty path, need to identify the path through different means
+isplainTxtFlag = true;
+fID = fopen(path2env, 'r');                                                 % open the file containing the env variable
+payloadPath = fscanf(fID,'%c');                                             % parse the file contents, returns path stored in the env variable
+if startsWith(payloadPath,'<?xml version="1.0"')                            % check for beginning of XML file
+    isplainTxtFlag = false;
+    payloadPath = [];                                                       % return empty path, need to identify the path through different means
 end
-fclose(fID);                                        % close the file
+fclose(fID);                                                                % close the file
 end
 
 function createEnvXML(caller, payloadPath, version, path2env)
 % create an XML env from a provided caller and path value
-env = struct();
-env.caller = caller;
+env = struct();                                                             % create the output structure
+env.caller = caller;                                                        % populate the structure with the payload data
 env.path = payloadPath;
 envs.env = env;
 envs.version = version;
-writestruct(envs, path2env, "FileType", "xml", "StructNodeName", "environmentalVariables");
+writestruct(envs, path2env, ...                                             % write env to filesystem
+    "FileType", "xml", ...                                                  % write as XML
+    "StructNodeName", "environmentalVariables");                            % rename the root node
 end
 
 function payloadPath = selectEnvPath()
 % open folder selection dialoge, to select the path to be stored in the env
-payloadPath = uigetdir("C:\",'Define default directory');   % open folder selection dialog box
-if isnumeric(payloadPath)
+payloadPath = uigetdir("C:\",'Define default directory');                   % open folder selection dialog box
+if isnumeric(payloadPath)                                                   % if the path is numeric, the dialog was aborted by the user
     error('User abort during selection of default path.\n');
 end
 end
