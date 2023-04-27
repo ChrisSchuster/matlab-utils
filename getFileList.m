@@ -9,14 +9,24 @@ function [filelist, filetable] = getFileList(fsPath,mode,extensions)
 %   getFileList(fsPath,'include',{'txt','ldx'})
 %   getFileList(fsPath,'exclude','.stignore')
 
-% if the shortcut call is used use the default mode 'all'
-if nargin==1
-    mode = 'all';
-end
 % if there is more than one output, create a table of the contents
 createTable = false;
 if nargout > 1
     createTable = true;
+end
+
+% safe abort in case the file selection dialog was aborted by user
+if ~logical(fsPath)
+    filelist = 0;
+    if createTable
+        filetable = 0;
+    end
+    return;
+end
+
+% if the shortcut call is used use the default mode 'all'
+if nargin==1
+    mode = 'all';
 end
 
 dircontents = dir(fsPath);                  % get the contents of the directory
