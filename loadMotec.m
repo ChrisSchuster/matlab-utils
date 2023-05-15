@@ -19,10 +19,15 @@ SampleCount_bin = unique(nSamples);                                         % ge
 
 % create bins for signals of same count
 apped_table = false;
+nSignals_ignored = 0;
 tic
 for bin = 1:numel(SampleCount_bin)
+    
     signals_in_bin = find( nSamples == SampleCount_bin(bin) );              % get a list of indices of signals in a bin of same sample count
-
+    if SampleCount_bin(bin) == 0                                            % skip signals with a sample count of zero
+        nSignals_ignored = numel(signals_in_bin);                           % store the number of signals ignored
+        continue
+    end
     % test for matching timestamps of the signals in the current bin
     result = compareTimestamps(data, fldnames(signals_in_bin), SampleCount_bin(bin));
 
@@ -69,10 +74,10 @@ signals.Properties.UserData.srcFileName = fName;
 signals.Properties.UserData.srcFilePath = sourcePath;
 
 % validation
-if nVariables ~= width(signals)
+if nVariables ~= width(signals) + nSignals_ignored
     error("signals were dropped in the operation")
 end
-s
+
 end
 
 function temp_table = signals2table(data, signal_names, nSamples)
