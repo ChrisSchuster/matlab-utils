@@ -15,45 +15,39 @@ for field=1:nVariables
     nSamples(field) = numel(data.(fldnames{field}).Time');
 end
 
-nSamples_bin = unique(nSamples);                                            % get a list of unique sample counts
+SampleCount_bin = unique(nSamples);                                         % get a list of unique sample counts
 
 % create bins for signals of same count
 apped_table = false;
 tic
-for bin = 1:numel(nSamples_bin)
-    signals_in_bin = find(nSamples==nSamples_bin(bin));                     % get a list of indices of signals in a bin of same sample count
-    nSignals_in_bin(bin) = numel(signals_in_bin);                           % number of signals in each bin
-    
-    % get matching timestamps for the signals in the current bin
-    result = compareTimestamps(data, fldnames(signals_in_bin), nSamples_bin(bin));
+for bin = 1:numel(SampleCount_bin)
+    signals_in_bin = find( nSamples == SampleCount_bin(bin) );              % get a list of indices of signals in a bin of same sample count
 
-    if all(result)                                                          % all timestamps match: signals can be placed in a table directly
-        temp_table = signals2table(data, fldnames(signals_in_bin), nSamples_bin(bin));
-    else                                                                    % some timestamps are mismatch: further processing required
-        % we group the signals into bins again
-        % all signals matching with the first signal of the bin will be placed in a table
-        binsRemaining = true;
-        append_subtable = false;
+    % test for matching timestamps of the signals in the current bin
+    result = compareTimestamps(data, fldnames(signals_in_bin), SampleCount_bin(bin));
 
-        while binsRemaining
-            % get indices of signals currently matching the timestamp bin
-            signals_in_subBin = signals_in_bin(result);
-            % create a table from these signals
-            temp_table_subBin = signals2table(data, fldnames(signals_in_subBin), nSamples_bin(bin));
-            % either this table is the basis for a syncronisation operation
-            % next time around or it needs to be syncronised
-            if append_subtable                                              % the table needs to be syncronised into an existing table
-                temp_table = synchronize(temp_table, temp_table_subBin, 'union', 'previous');
-            else                                                            % this table is the first for this sub bin operation
-                temp_table = temp_table_subBin;
-                append_subtable = true;
-            end
-            signals_in_bin = signals_in_bin(~result);                       % remove processed signals
-            if isempty(signals_in_bin)                                      % check if there are any more timestamps bins
-                binsRemaining = false;                                      % end operation
-            else                                                            % look for new timestamp bins
-                result = compareTimestamps(data, fldnames(signals_in_bin), nSamples_bin(bin));
-            end
+    % process signals with the matching timestamps as a sub-bin
+    binsRemaining = true;
+    append_subtable = false;
+
+    while binsRemaining
+        signals_in_subBin = signals_in_bin(result);                         % get indices of signals currently matching the timestamp bin
+        temp_table_subBin = signals2table(data, fldnames(signals_in_subBin), SampleCount_bin(bin));    % create a table from these signals
+
+        % either this table is the basis for a syncronisation operation next time around or it needs to be syncronised
+        if append_subtable                                                  % the table needs to be syncronised into an existing table
+            temp_table = synchronize(temp_table, temp_table_subBin, 'union', 'previous');
+        else                                                                % this table is the first for this sub bin operation
+            temp_table = temp_table_subBin;
+        end
+
+        signals_in_bin = signals_in_bin(~result);                           % remove processed signals
+
+        if isempty(signals_in_bin)                                          % check if there are any more timestamps bins
+            binsRemaining = false;                                          % end operation
+        else                                                                % look for new timestamp bins
+            result = compareTimestamps(data, fldnames(signals_in_bin), SampleCount_bin(bin));
+            append_subtable = true;                                         % if there are anymore sub-bins, then we need to add to the sub-timetable
         end
     end
 
@@ -74,6 +68,11 @@ signals.Time.Format = 's';                                                  % sh
 signals.Properties.UserData.srcFileName = fName;
 signals.Properties.UserData.srcFilePath = sourcePath;
 
+% validation
+if nVariables ~= width(signals)
+    error("signals were dropped in the operation")
+end
+s
 end
 
 function temp_table = signals2table(data, signal_names, nSamples)
