@@ -65,6 +65,40 @@ for bin = 1:numel(SampleCount_bin)
     end
 end
 
+% lap trigger
+if any(matches(fldnames, 'Lap_Beacon_Ticks'))
+    signals.Lap_Trigger = [0; diff(signals.Lap_Beacon_Ticks)] > 0;
+    lap_edge = find(signals.Lap_Trigger);
+    n_laps = numel(lap_edge)+1;
+    laps_lower_ind = NaN(n_laps, 1);
+    laps_upper_ind = NaN(n_laps, 1);
+    n_samples = height(signals);
+    signals.Lap_Number = NaN(n_samples, 1);
+
+    for lap = 1:n_laps
+
+        if lap == 1
+            start_ind = find(~isnan(signals.Lap_Beacon_Ticks), 1, 'first');
+        else
+            start_ind = lap_edge(lap-1)+1;
+        end
+
+        if lap == n_laps
+            end_ind = n_samples;
+        else
+            end_ind = lap_edge(lap);
+        end
+
+        laps_lower_ind(lap) = start_ind;
+        laps_upper_ind(lap) = end_ind;
+
+        signals.Lap_Number(start_ind:end_ind) = lap;
+    end
+    signals.Properties.UserData.laps_lower_ind = laps_lower_ind;
+    signals.Properties.UserData.laps_upper_ind = laps_upper_ind;
+    nVariables = nVariables + 2;                                            % correct for the added signals
+end
+
 signals.Time.Format = 's';                                                  % show the timestamp as ss:SSS
 
 [~,fName] = fileparts(sourcePath);
