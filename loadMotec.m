@@ -65,6 +65,13 @@ for bin = 1:numel(SampleCount_bin)
     end
 end
 
+if isnan(signals.Properties.SampleRate)
+    % when the automatically calculated sample rate is NaN, calculate our own
+    % this may happen, when the time information is irregular (non-consistent)
+    % mode is used to get the most common timestep
+    signals.Properties.SampleRate = 1/seconds(mode(diff(signals.Time)));
+end
+
 % lap trigger
 if any(matches(fldnames, 'Lap_Beacon_Ticks'))
     signals.Lap_Trigger = [0; diff(signals.Lap_Beacon_Ticks)] > 0;
