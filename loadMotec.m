@@ -20,7 +20,6 @@ SampleCount_bin = unique(nSamples);                                         % ge
 % create bins for signals of same count
 apped_table = false;
 nSignals_ignored = 0;
-tic
 for bin = 1:numel(SampleCount_bin)
     
     signals_in_bin = find( nSamples == SampleCount_bin(bin) );              % get a list of indices of signals in a bin of same sample count
@@ -65,7 +64,6 @@ for bin = 1:numel(SampleCount_bin)
         apped_table = true;
     end
 end
-toc
 
 signals.Time.Format = 's';                                                  % show the timestamp as ss:SSS
 
