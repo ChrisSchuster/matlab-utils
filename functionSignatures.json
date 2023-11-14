@@ -8,5 +8,13 @@
             {"name":"mode", "kind":"required", "type":[["char", "choices={'all','exclude','include'}"]], "default":"'all'", "purpose":"file extension filter"},
             {"name":"extensions", "kind":"ordered", "type":[["cell"]], "purpose":"list of file extensions"}
         ]
+    },
+    "getPathFromEnv":
+    {
+        "inputs":
+        [
+            {"name": "type", "kind":"required", "type":["string", "choices={'file','folder'}"], "purpose":"type of path"},
+            {"name": "mode", "kind":"ordered", "type":["string", "choices={'silent','UserSelect'}"], "purpose":"open file directly or show interface"}
+        ]
     }
 }

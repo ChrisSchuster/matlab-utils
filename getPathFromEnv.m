@@ -1,4 +1,4 @@
-function [fsPath] = getPathFromEnv(type)
+function [fsPath] = getPathFromEnv(type, varargin)
 %GETDIRPATHFROMENV Returns a path from environment variable at the root of the invoking script
 %   input: empty
 %   output: filesystem path as char
@@ -13,6 +13,21 @@ path2env = fullfile(path2env,'.env');                                       % cr
 
 caller = caller(2).name;                                                    % get the name of the function that invoked getPathFromEnv()
 envExists = isfile(path2env);                                               % check if environmental variable is set
+
+defaultMode = "UserSelect";
+p = inputParser;
+datatypeValidation = @(x) isstring(x);
+addRequired(p, 'type', datatypeValidation);
+addOptional(p, 'mode', defaultMode, datatypeValidation );
+
+parse(p, type, varargin{:});
+type = p.Results.type;
+mode = p.Results.mode;
+
+queryPath = true;
+if(matches(type,"file") && matches(mode,"silent"))                          % determine if we have to query for a file or a path
+    queryPath = false;                                                      % only if we are asked for a file and to open it silently do we have to query for a file immidiately
+end
 
 %% look for and read the environmental variable
 if envExists
@@ -35,7 +50,7 @@ if envExists
         if ~any(callerIndex)
             % the caller was not found in the env
             % add it and store the desired path
-            payloadPath = selectEnvPath();
+            payloadPath = selectEnvPath(queryPath);
             newEnvIndex = numberEnvs+1;
             envs.env(newEnvIndex).caller = caller;
             envs.env(newEnvIndex).path = payloadPath;
@@ -49,8 +64,13 @@ if envExists
 else
     % an env variable was not found, create it and store the desired
     % default path in it
-    payloadPath = selectEnvPath();
+    payloadPath = selectEnvPath(queryPath);
     createEnvXML(caller, payloadPath, version, path2env);
+end
+
+if(matches(mode,'silent'))
+    fsPath = payloadPath;
+    return;
 end
 
 %% display the folder/file selection dialog
@@ -91,9 +111,16 @@ writestruct(envs, path2env, ...                                             % wr
     "StructNodeName", "environmentalVariables");                            % rename the root node
 end
 
-function payloadPath = selectEnvPath()
+function payloadPath = selectEnvPath(queryPath)
 % open folder selection dialoge, to select the path to be stored in the env
-payloadPath = uigetdir("C:\",'Define default directory');                   % open folder selection dialog box
+
+if(queryPath)
+    payloadPath = uigetdir("C:\",'Define default directory');                   % open folder selection dialog box
+else
+    [fname,fpath] = uigetfile("C:\*.*", "Define file to open");
+    payloadPath = fullfile(fpath, fname);
+end
+
 if isnumeric(payloadPath)                                                   % if the path is numeric, the dialog was aborted by the user
     error('User abort during selection of default path.\n');
 end
