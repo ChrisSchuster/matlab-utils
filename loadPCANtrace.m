@@ -23,33 +23,22 @@ for msgIDidx = 1:nMsg       % message ID index
         sigName = dbc.MessageInfo(msgIDidx).Signals{sig};
         offset = dbc.MessageInfo(msgIDidx).SignalInfo(sig).Offset;
         scale = dbc.MessageInfo(msgIDidx).SignalInfo(sig).Factor;               % signal scaling factor
-        endianess = dbc.MessageInfo(msgIDidx).SignalInfo(sig).ByteOrder;
 
         startbit = dbc.MessageInfo(msgIDidx).SignalInfo(sig).StartBit;
-
-        switch endianess
-            case 'BigEndian'
-                startbit = startbit - 8;
+        endianess = dbc.MessageInfo(msgIDidx).SignalInfo(sig).ByteOrder;
+        
+        if(matches(endianess, 'BigEndian'))
+            data_temp = byteReorder(8, data);                               % reorder entire data in message
+            startbit = bigStartbit(startbit);
+        else
+            data_temp = data;
         end
-
+        
         length = dbc.MessageInfo(msgIDidx).SignalInfo(sig).SignalSize;
-        endbit = startbit + length;
-        % bitorder in the CAN message is inverse to the bitorder we use
-        invStartbit = 64 - endbit;
-        % create mask to select signal from data
         bitmask = 2^length - 1;
-        bitmask = bitshift(uint64(bitmask),invStartbit);
+        bitmask = bitshift(uint64(bitmask),startbit);
 
-        signal = bitshift(bitand(data,bitmask), -1*invStartbit);
-
-        %% rearrange bytes when byte order is little / intel
-        switch endianess
-            case 'LittleEndian'
-                bytes = ceil(length / 8);
-                if bytes > 1
-                    signal = byteReorder(bytes,signal);
-                end
-        end
+        signal = bitshift(bitand(data_temp,bitmask), -1*startbit);
 
         signal = double(signal) * scale + offset;
 
