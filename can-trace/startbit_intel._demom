@@ -1,0 +1,8 @@
+startbit = [8; 14; 15; 47; 46; 43; 40];
+
+startbyte = floor(startbit./8);
+bitoffset = 7-mod(startbit, 8);
+
+actual = startbyte .* 8 + bitoffset
+
+actual_inv = 63 - actual
